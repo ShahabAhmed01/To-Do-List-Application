@@ -1,26 +1,58 @@
-📝 TaskFlow – Minimal To-Do List (C++)
+# TaskFlow — Console To-Do List (C++)
 
-TaskFlow is a simple and colorful console-based To-Do List application written in C++.
-It allows users to manage daily tasks with a clean interface, progress tracking, and task completion system.
+**A colorful terminal to-do manager** for adding tasks, marking them complete, tracking progress, and clearing finished items.
 
-✨ Features
-➕ Add new tasks
-👁️ View all tasks
-✅ Mark tasks as completed
-🗑️ Remove completed tasks
-📊 Progress bar tracking
-📅 Automatic task timestamps
-🎨 Colored console interface
-💻 Works on Windows and Linux
+<p align="center">
+  <img src="https://img.shields.io/badge/C++-17-00599C?style=flat-square&logo=cplusplus&logoColor=white" alt="C++" />
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-4D4D4D?style=flat-square" alt="Platform" />
+</p>
 
-🛠️ Built With
-C++
-STL (vector, algorithm, string)
-ANSI Colors / Windows Console API
+---
 
-👤 Author
-Shahab Ahmed
-LinkedIn: linkedin.com/in/shahabahmed01
+## Overview
 
-📜 License
-This project is open-source and free to use for learning purposes.
+TaskFlow is a menu-driven console application built with C++ and the STL. It stores tasks in memory with timestamps and uses ANSI colors (and Windows console APIs where needed) for a readable terminal experience.
+
+## Features
+
+- Add new tasks with automatic timestamps
+- View all tasks in a formatted list
+- Mark tasks as completed
+- Remove completed tasks in bulk
+- **Progress bar** for completion ratio
+- Colored console UI on **Windows** and **Linux**
+
+## Quick start
+
+```bash
+g++ -std=c++17 -o taskflow "To-Do List Application.cpp" && ./taskflow
+```
+
+**Windows:**
+
+```powershell
+g++ -std=c++17 -o taskflow.exe "To-Do List Application.cpp"
+.\taskflow.exe
+```
+
+## Built with
+
+- **C++17**
+- **STL** — `vector`, `string`, `algorithm`
+- **ANSI colors** / Windows Console API
+
+## Project structure
+
+```
+To-Do-List-Application/
+├── To-Do List Application.cpp
+└── README.md
+```
+
+## Author
+
+**Shahab Ahmed** — [GitHub](https://github.com/ShahabAhmed01) · [LinkedIn](https://www.linkedin.com/in/shahabahmed01/) · [Portfolio](https://shahabahmed01.github.io)
+
+## License
+
+Open source for learning and portfolio use.
