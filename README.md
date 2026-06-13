@@ -13,6 +13,13 @@
 
 TaskFlow is a menu-driven console application built with C++ and the STL. It stores tasks in memory with timestamps and uses ANSI colors (and Windows console APIs where needed) for a readable terminal experience.
 
+## Screenshots
+
+<p align="center">
+  <img src="demo-assets/screenshots/01-main-menu.png" alt="Main Menu" width="45%" />
+  <img src="demo-assets/screenshots/02-view-tasks.png" alt="View Tasks & Progress Bar" width="45%" />
+</p>
+
 ## Features
 
 - Add new tasks with automatic timestamps
