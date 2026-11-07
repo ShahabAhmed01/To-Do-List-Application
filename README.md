@@ -148,6 +148,7 @@ Dependabot checks for GitHub Actions updates monthly.
 ├── CHANGELOG.md
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
+├── LICENSE
 ├── README.md
 ├── SECURITY.md
 └── To-Do List Application.cpp
@@ -170,11 +171,7 @@ opening a public issue.
 
 ## License
 
-**No license has been selected yet.** No `LICENSE` file exists in this
-repository, so default copyright rules apply: the source may be viewed and
-forked on GitHub, but reuse and redistribution are not granted. The maintainer
-is evaluating a license recommendation; this section will be updated once a
-license is added.
+MIT — see [LICENSE](LICENSE).
 
 ## Author
 
