@@ -28,7 +28,7 @@ py -m pip install pillow pyte pywinpty
 # Build the app first.
 g++ -std=c++17 -O2 -o taskflow.exe "To-Do List Application.cpp"
 
-# Screenshots and GIF (about 20 seconds).
+# Screenshots and GIF.
 py demo-assets/record_demo.py --binary .\taskflow.exe
 
 # Social preview from the regenerated screenshot.

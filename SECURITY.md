@@ -20,8 +20,9 @@ Include:
 - The affected commit or branch.
 - Any suggested fix.
 
-You can expect an initial acknowledgement within seven days. If the report is
-valid, a fix will be prepared on a branch and disclosed after it is merged.
+You can expect an initial acknowledgement as soon as the maintainer is
+available. If the report is valid, a fix will be prepared on a branch and
+disclosed after it is merged.
 
 ## Scope
 
