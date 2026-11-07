@@ -2,16 +2,12 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <limits>
 #include <ctime>
 #include <iomanip>
-#include <sstream>
-#include <cctype>
+#include <cstdlib>
 
 #ifdef _WIN32
     #include <windows.h>
-#else
-    #include <unistd.h>
 #endif
 
 using namespace std;
@@ -54,13 +50,15 @@ struct Task {
 
 // ==================== FUNCTION PROTOTYPES ====================
 void clearScreen();
+void pauseConsole();
 void printHeader();
 void printCreatorInfo();
-void printCentered(string text, char fillChar = ' ');
-string getCurrentDate();
+void printCentered(const string& text, const string& fill = " ");
 string formatDate(time_t t);
 void printTask(const Task& task);
 void printProgressBar(int completed, int total);
+bool readInt(const string& prompt, int& value);
+bool isBlank(const string& text);
 
 // Main functions - Only the requested ones
 void displayMainMenu();
@@ -73,25 +71,82 @@ void clearScreen() {
     #ifdef _WIN32
         system("cls");
     #else
-        system("clear");
+        cout << "\033[2J\033[H" << flush;
     #endif
 }
 
+#ifdef _WIN32
 void setColor(int color) {
-    #ifdef _WIN32
-        SetConsoleTextAttribute(hConsole, color);
-    #endif
+    SetConsoleTextAttribute(hConsole, color);
+}
+#endif
+
+void pauseConsole() {
+    cout << "\n  Press Enter to continue...";
+    string line;
+    getline(cin, line);
 }
 
-void printCentered(string text, char fillChar) {
-    int width = 60;
-    int padding = (width - text.length()) / 2;
+bool isBlank(const string& text) {
+    return text.find_first_not_of(" \t\r\n") == string::npos;
+}
+
+bool readInt(const string& prompt, int& value) {
+    while (true) {
+        cout << prompt;
+        string line;
+        if (!getline(cin, line)) {
+            return false;
+        }
+
+        if (isBlank(line)) {
+            cout << "  Invalid input. Please enter a number.\n";
+            continue;
+        }
+
+        size_t start = line.find_first_not_of(" \t\r\n");
+        size_t end = line.find_last_not_of(" \t\r\n");
+        string token = line.substr(start, end - start + 1);
+
+        try {
+            size_t consumed = 0;
+            int parsed = stoi(token, &consumed);
+            if (consumed == token.size()) {
+                value = parsed;
+                return true;
+            }
+        } catch (...) {
+        }
+
+        cout << "  Invalid input. Please enter a number.\n";
+    }
+}
+
+size_t utf8Length(const string& text) {
+    size_t length = 0;
+    for (unsigned char c : text) {
+        if ((c & 0xC0) != 0x80) {
+            ++length;
+        }
+    }
+    return length;
+}
+
+void printCentered(const string& text, const string& fill) {
+    const int width = 60;
+    const int textWidth = static_cast<int>(utf8Length(text));
+    int padding = (width - textWidth) / 2;
     if (padding < 0) padding = 0;
 
     #ifndef _WIN32
         cout << BOLD;
     #endif
-    cout << string(padding, fillChar) << text << string(padding, fillChar) << endl;
+
+    for (int i = 0; i < padding; ++i) cout << fill;
+    cout << text;
+    for (int i = 0; i < padding; ++i) cout << fill;
+    cout << endl;
+
     #ifndef _WIN32
         cout << RESET_COLOR;
     #endif
@@ -106,9 +161,9 @@ void printHeader() {
     #endif
 
     cout << "\n";
-    printCentered("══════════════════════════════════════", '═');
+    printCentered("══════════════════════════════════════", "═");
     printCentered("     TASKFLOW - MINIMAL TO-DO LIST     ");
-    printCentered("══════════════════════════════════════", '═');
+    printCentered("══════════════════════════════════════", "═");
 
     #ifndef _WIN32
         cout << CYAN;
@@ -118,7 +173,7 @@ void printHeader() {
 
     time_t now = time(0);
     cout << "\n";
-    printCentered("📅 " + formatDate(now));
+    printCentered("Date: " + formatDate(now));
 
     #ifdef _WIN32
         RESET_COLOR;
@@ -135,10 +190,10 @@ void printCreatorInfo() {
     #endif
 
     cout << "\n";
-    printCentered("──────────────────────────────────────", '─');
-    printCentered("Creator: Shahab Ahmed", ' ');
-    printCentered("LinkedIn: linkedin.com/in/shahabahmed01", ' ');
-    printCentered("──────────────────────────────────────", '─');
+    printCentered("──────────────────────────────────────", "─");
+    printCentered("Creator: Shahab Ahmed");
+    printCentered("LinkedIn: linkedin.com/in/shahabahmed01");
+    printCentered("──────────────────────────────────────", "─");
 
     #ifdef _WIN32
         RESET_COLOR;
@@ -146,16 +201,6 @@ void printCreatorInfo() {
         cout << RESET_COLOR;
     #endif
     cout << "\n";
-}
-
-string getCurrentDate() {
-    time_t now = time(0);
-    tm *ltm = localtime(&now);
-    stringstream ss;
-    ss << (1900 + ltm->tm_year) << "-"
-       << setw(2) << setfill('0') << (1 + ltm->tm_mon) << "-"
-       << setw(2) << setfill('0') << ltm->tm_mday;
-    return ss.str();
 }
 
 string formatDate(time_t t) {
@@ -168,17 +213,17 @@ string formatDate(time_t t) {
 void printTask(const Task& task) {
     #ifndef _WIN32
         if (task.completed) {
-            cout << GREEN << "  ✓ ";
+            cout << GREEN << "  [x] ";
         } else {
-            cout << YELLOW << "  ◻ ";
+            cout << YELLOW << "  [ ] ";
         }
     #else
         if (task.completed) {
             setColor(10);
-            cout << "  ✓ ";
+            cout << "  [x] ";
         } else {
             setColor(14);
-            cout << "  ◻ ";
+            cout << "  [ ] ";
         }
     #endif
 
@@ -212,7 +257,7 @@ void printProgressBar(int completed, int total) {
 
     float percentage = (float)completed / total * 100;
     int barWidth = 25;
-    int filledWidth = (percentage / 100) * barWidth;
+    int filledWidth = static_cast<int>((percentage / 100.0f) * barWidth);
 
     #ifndef _WIN32
         cout << CYAN;
@@ -257,7 +302,7 @@ void displayMainMenu() {
     #endif
 
     cout << "\n";
-    printCentered("─────────── MAIN MENU ───────────", '─');
+    printCentered("─────────── MAIN MENU ───────────", "─");
 
     #ifndef _WIN32
         cout << CYAN;
@@ -265,12 +310,12 @@ void displayMainMenu() {
         setColor(11);
     #endif
 
-    cout << "\n  1. 📝 Add New Task\n";
-    cout << "  2. 👁️  View All Tasks\n";
-    cout << "  3. ✅ Mark Task as Completed\n";
-    cout << "  4. 🗑️  Remove Completed Tasks\n";
-    cout << "  5. ℹ️  About / Creator Info\n";
-    cout << "  0. 🚪 Exit\n";
+    cout << "\n  1. Add New Task\n";
+    cout << "  2. View All Tasks\n";
+    cout << "  3. Mark Task as Completed\n";
+    cout << "  4. Remove Completed Tasks\n";
+    cout << "  5. About / Creator Info\n";
+    cout << "  0. Exit\n";
 
     #ifndef _WIN32
         cout << BLUE;
@@ -279,21 +324,7 @@ void displayMainMenu() {
     #endif
 
     cout << "\n";
-    printCentered("──────────────────────────────────", '─');
-
-    #ifndef _WIN32
-        cout << YELLOW;
-    #else
-        setColor(14);
-    #endif
-
-    cout << "\n  Enter your choice: ";
-
-    #ifdef _WIN32
-        RESET_COLOR;
-    #else
-        cout << RESET_COLOR;
-    #endif
+    printCentered("──────────────────────────────────", "─");
 }
 
 void addTask(vector<Task>& tasks, int& nextId) {
@@ -305,27 +336,29 @@ void addTask(vector<Task>& tasks, int& nextId) {
         setColor(10);
     #endif
 
-    printCentered("➕ ADD NEW TASK", ' ');
+    cout << "\n";
+    printCentered("+ ADD NEW TASK");
     cout << endl;
 
-    cin.ignore();
     string description;
     cout << "  Enter task description: ";
-    getline(cin, description);
+    if (!getline(cin, description)) {
+        return;
+    }
 
-    if (description.empty()) {
+    if (isBlank(description)) {
         #ifndef _WIN32
             cout << RED;
         #else
             setColor(12);
         #endif
-        cout << "\n  ✗ Task description cannot be empty!\n";
+        cout << "\n  Task description cannot be empty!\n";
         #ifdef _WIN32
             RESET_COLOR;
         #else
             cout << RESET_COLOR;
         #endif
-        system("pause");
+        pauseConsole();
         return;
     }
 
@@ -337,7 +370,7 @@ void addTask(vector<Task>& tasks, int& nextId) {
         setColor(10);
     #endif
 
-    cout << "\n  ✓ Task added successfully! (ID: " << nextId << ")\n";
+    cout << "\n  Task added successfully! (ID: " << nextId << ")\n";
     nextId++;
 
     #ifdef _WIN32
@@ -345,7 +378,7 @@ void addTask(vector<Task>& tasks, int& nextId) {
     #else
         cout << RESET_COLOR;
     #endif
-    system("pause");
+    pauseConsole();
 }
 
 void viewTasks(const vector<Task>& tasks) {
@@ -357,14 +390,15 @@ void viewTasks(const vector<Task>& tasks) {
         #else
             setColor(14);
         #endif
-        printCentered("📭 NO TASKS FOUND", ' ');
+        cout << "\n";
+        printCentered("NO TASKS FOUND");
         cout << "\n  Your task list is empty. Add some tasks to get started!\n";
         #ifdef _WIN32
             RESET_COLOR;
         #else
             cout << RESET_COLOR;
         #endif
-        system("pause");
+        pauseConsole();
         return;
     }
 
@@ -374,7 +408,8 @@ void viewTasks(const vector<Task>& tasks) {
         setColor(11);
     #endif
 
-    printCentered("📋 YOUR TASKS", ' ');
+    cout << "\n";
+    printCentered("YOUR TASKS");
     cout << endl;
 
     int completed = 0;
@@ -383,7 +418,7 @@ void viewTasks(const vector<Task>& tasks) {
         if (task.completed) completed++;
     }
 
-    printProgressBar(completed, tasks.size());
+    printProgressBar(completed, static_cast<int>(tasks.size()));
 
     #ifndef _WIN32
         cout << GRAY;
@@ -391,7 +426,7 @@ void viewTasks(const vector<Task>& tasks) {
         setColor(8);
     #endif
 
-    cout << "\n  📊 Summary: ";
+    cout << "\n  Summary: ";
     cout << "Total: " << tasks.size()
          << " | Completed: " << completed
          << " | Pending: " << tasks.size() - completed << endl;
@@ -401,31 +436,34 @@ void viewTasks(const vector<Task>& tasks) {
     #else
         cout << RESET_COLOR;
     #endif
-    system("pause");
+    pauseConsole();
 }
 
 void markTaskComplete(vector<Task>& tasks) {
+    printHeader();
+
     if (tasks.empty()) {
         #ifndef _WIN32
             cout << RED;
         #else
             setColor(12);
         #endif
-        cout << "  ✗ No tasks to mark as complete!\n";
+        cout << "  No tasks to mark as complete!\n";
         #ifdef _WIN32
             RESET_COLOR;
         #else
             cout << RESET_COLOR;
         #endif
-        system("pause");
+        pauseConsole();
         return;
     }
 
     viewTasks(tasks);
 
-    cout << "\n  Enter Task ID to mark as complete (0 to cancel): ";
     int taskId;
-    cin >> taskId;
+    if (!readInt("\n  Enter Task ID to mark as complete (0 to cancel): ", taskId)) {
+        return;
+    }
 
     if (taskId == 0) return;
 
@@ -438,21 +476,21 @@ void markTaskComplete(vector<Task>& tasks) {
                 #else
                     setColor(10);
                 #endif
-                cout << "\n  ✓ Task marked as complete!\n";
+                cout << "\n  Task marked as complete!\n";
             } else {
                 #ifndef _WIN32
                     cout << YELLOW;
                 #else
                     setColor(14);
                 #endif
-                cout << "\n  ℹ Task is already completed!\n";
+                cout << "\n  Task is already completed!\n";
             }
             #ifdef _WIN32
                 RESET_COLOR;
             #else
                 cout << RESET_COLOR;
             #endif
-            system("pause");
+            pauseConsole();
             return;
         }
     }
@@ -462,29 +500,31 @@ void markTaskComplete(vector<Task>& tasks) {
     #else
         setColor(12);
     #endif
-    cout << "\n  ✗ Task with ID " << taskId << " not found!\n";
+    cout << "\n  Task with ID " << taskId << " not found!\n";
     #ifdef _WIN32
         RESET_COLOR;
     #else
         cout << RESET_COLOR;
     #endif
-    system("pause");
+    pauseConsole();
 }
 
 void removeTask(vector<Task>& tasks) {
+    printHeader();
+
     if (tasks.empty()) {
         #ifndef _WIN32
             cout << RED;
         #else
             setColor(12);
         #endif
-        cout << "  ✗ No tasks to remove!\n";
+        cout << "  No tasks to remove!\n";
         #ifdef _WIN32
             RESET_COLOR;
         #else
             cout << RESET_COLOR;
         #endif
-        system("pause");
+        pauseConsole();
         return;
     }
 
@@ -494,17 +534,19 @@ void removeTask(vector<Task>& tasks) {
     cout << "  1. Remove specific completed task by ID\n";
     cout << "  2. Remove all completed tasks\n";
     cout << "  0. Cancel\n";
-    cout << "  Enter option: ";
 
     int option;
-    cin >> option;
+    if (!readInt("  Enter option: ", option)) {
+        return;
+    }
 
     if (option == 0) return;
 
     if (option == 1) {
         int taskId;
-        cout << "  Enter Task ID to remove: ";
-        cin >> taskId;
+        if (!readInt("  Enter Task ID to remove: ", taskId)) {
+            return;
+        }
 
         auto it = find_if(tasks.begin(), tasks.end(),
                         [taskId](const Task& t) { return t.id == taskId; });
@@ -518,14 +560,14 @@ void removeTask(vector<Task>& tasks) {
                 #else
                     setColor(10);
                 #endif
-                cout << "  ✓ Task removed successfully!\n";
+                cout << "  Task removed successfully!\n";
             } else {
                 #ifndef _WIN32
                     cout << YELLOW;
                 #else
                     setColor(14);
                 #endif
-                cout << "\n  ℹ Task is not completed yet. Only completed tasks can be removed.\n";
+                cout << "\n  Task is not completed yet. Only completed tasks can be removed.\n";
             }
         } else {
             #ifndef _WIN32
@@ -533,31 +575,39 @@ void removeTask(vector<Task>& tasks) {
             #else
                 setColor(12);
             #endif
-            cout << "\n  ✗ Task with ID " << taskId << " not found!\n";
+            cout << "\n  Task with ID " << taskId << " not found!\n";
         }
     }
     else if (option == 2) {
-        int initialSize = tasks.size();
+        int initialSize = static_cast<int>(tasks.size());
         tasks.erase(remove_if(tasks.begin(), tasks.end(),
                             [](const Task& t) { return t.completed; }),
                    tasks.end());
 
-        int removedCount = initialSize - tasks.size();
+        int removedCount = initialSize - static_cast<int>(tasks.size());
         if (removedCount > 0) {
             #ifndef _WIN32
                 cout << GREEN;
             #else
                 setColor(10);
             #endif
-            cout << "\n  ✓ Removed " << removedCount << " completed task(s)!\n";
+            cout << "\n  Removed " << removedCount << " completed task(s)!\n";
         } else {
             #ifndef _WIN32
                 cout << YELLOW;
             #else
                 setColor(14);
             #endif
-            cout << "\n  ℹ No completed tasks to remove!\n";
+            cout << "\n  No completed tasks to remove!\n";
         }
+    }
+    else {
+        #ifndef _WIN32
+            cout << YELLOW;
+        #else
+            setColor(14);
+        #endif
+        cout << "\n  Invalid removal option.\n";
     }
 
     #ifdef _WIN32
@@ -565,23 +615,26 @@ void removeTask(vector<Task>& tasks) {
     #else
         cout << RESET_COLOR;
     #endif
-    system("pause");
+    pauseConsole();
 }
 
 // ==================== MAIN FUNCTION ====================
 int main() {
     vector<Task> tasks;
     int nextId = 1;
-    int choice;
+    int choice = -1;
 
-    // Set console to UTF-8 on Windows for emoji support
+    // Set the Windows console to UTF-8 for the box-drawing characters.
     #ifdef _WIN32
         SetConsoleOutputCP(65001);
+        SetConsoleCP(65001);
     #endif
 
     do {
         displayMainMenu();
-        cin >> choice;
+        if (!readInt("  Enter your choice: ", choice)) {
+            break;
+        }
 
         switch(choice) {
             case 1:
@@ -599,7 +652,7 @@ int main() {
             case 5:
                 printHeader();
                 printCreatorInfo();
-                system("pause");
+                pauseConsole();
                 break;
             case 0:
                 printHeader();
@@ -608,7 +661,7 @@ int main() {
                 #else
                     setColor(10);
                 #endif
-                printCentered("👋 THANK YOU FOR USING TASKFLOW!", ' ');
+                printCentered("THANK YOU FOR USING TASKFLOW!");
                 printCreatorInfo();
                 #ifdef _WIN32
                     RESET_COLOR;
@@ -628,7 +681,7 @@ int main() {
                 #else
                     cout << RESET_COLOR;
                 #endif
-                system("pause");
+                pauseConsole();
         }
 
     } while (choice != 0);
