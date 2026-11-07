@@ -41,6 +41,14 @@ TaskFlow is intentionally small. It currently does **not**:
 Persistence is the most significant missing capability: closing the program
 discards every task.
 
+## Roadmap
+
+Follow-up work is tracked in the issue tracker:
+
+- [Persist tasks between sessions](https://github.com/ShahabAhmed01/To-Do-List-Application/issues/2)
+- [Allow editing a task description](https://github.com/ShahabAhmed01/To-Do-List-Application/issues/3)
+- [Allow removing pending tasks](https://github.com/ShahabAhmed01/To-Do-List-Application/issues/4)
+
 ## Requirements
 
 - A C++17 compiler (GCC, Clang, or MSVC)
