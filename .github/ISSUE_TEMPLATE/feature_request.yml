@@ -1,0 +1,54 @@
+name: Feature request
+description: Suggest an improvement or a new capability for TaskFlow
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion. TaskFlow is intentionally small, so please
+        explain the problem first and keep proposals within a dependency-free
+        C++ console app.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the need or friction, not only the proposed feature.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should TaskFlow do differently?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches, workarounds, or tools you have tried.
+    validations:
+      required: false
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Area
+      options:
+        - Task management (add, edit, complete, delete)
+        - Persistence (saving tasks between sessions)
+        - Display and usability
+        - Build, tests, or CI
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: This request does not require external libraries by default.
+          required: false
