@@ -37,6 +37,8 @@ This project does not have tagged releases yet, so entries are grouped under
 - Removed unused includes, the unused `getCurrentDate()` helper, and an unused
   `setColor` stub on non-Windows builds.
 - Added spacing above section titles and validation for unknown removal options.
+- Fixed MSVC warnings for console color attributes (`C4244`) and local time
+  handling (`C4996`); the Windows CI build now treats warnings as errors.
 
 ### Changed
 

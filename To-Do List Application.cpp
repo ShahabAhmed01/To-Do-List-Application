@@ -77,7 +77,7 @@ void clearScreen() {
 
 #ifdef _WIN32
 void setColor(int color) {
-    SetConsoleTextAttribute(hConsole, color);
+    SetConsoleTextAttribute(hConsole, static_cast<WORD>(color));
 }
 #endif
 
@@ -204,9 +204,22 @@ void printCreatorInfo() {
 }
 
 string formatDate(time_t t) {
-    tm* timeinfo = localtime(&t);
+    tm timeinfo{};
+
+    #ifdef _WIN32
+        if (localtime_s(&timeinfo, &t) != 0) {
+            return "unknown";
+        }
+    #else
+        tm* result = localtime(&t);
+        if (result == nullptr) {
+            return "unknown";
+        }
+        timeinfo = *result;
+    #endif
+
     char buffer[80];
-    strftime(buffer, 80, "%Y-%m-%d %H:%M", timeinfo);
+    strftime(buffer, 80, "%Y-%m-%d %H:%M", &timeinfo);
     return string(buffer);
 }
 
