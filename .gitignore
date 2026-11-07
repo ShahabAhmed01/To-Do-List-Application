@@ -1,0 +1,17 @@
+# Build output
+taskflow
+taskflow.exe
+build/
+out/
+*.o
+*.obj
+*.exe
+
+# Editor and IDE files
+.vscode/
+.vs/
+*.user
+
+# Operating-system files
+.DS_Store
+Thumbs.db

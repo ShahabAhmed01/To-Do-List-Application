@@ -1,0 +1,9 @@
+*.cpp text eol=lf
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+
+*.png binary
+*.gif binary
