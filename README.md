@@ -5,6 +5,7 @@ complete, track your progress, and remove finished items — all from a single
 C++17 source file with no external dependencies.
 
 <p align="center">
+  <a href="https://github.com/ShahabAhmed01/To-Do-List-Application/actions/workflows/ci.yml"><img src="https://github.com/ShahabAhmed01/To-Do-List-Application/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status" /></a>
   <img src="https://img.shields.io/badge/C++-17-00599C?style=flat-square&logo=cplusplus&logoColor=white" alt="C++17" />
   <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-4D4D4D?style=flat-square" alt="Windows and Linux" />
 </p>
