@@ -21,13 +21,13 @@ C++17 source file with no external dependencies.
 
 ## Features
 
-- Add tasks with automatic creation timestamps
-- View tasks with IDs, completion state, creation time, and a progress bar
-- Mark tasks as completed by ID
-- Remove a single completed task or all completed tasks
-- Colored UI: Windows Console API on Windows, ANSI escape codes on Linux
-- Re-prompts on invalid numeric input instead of leaving the stream in a bad state
-- Portable pause and clear-screen behavior on Windows and Linux
+- Add new tasks with automatic timestamps
+- View all tasks in a formatted list
+- Mark tasks as completed
+- Remove a task by ID — pending tasks require confirmation
+- Remove completed tasks in bulk
+- **Progress bar** for completion ratio
+- Colored console UI on **Windows** and **Linux**
 
 ## Limitations
 
